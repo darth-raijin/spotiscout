@@ -15,7 +15,7 @@ app.register_blueprint(recent)
 
 
 @app.route("/")
-def method():
+def root():
     return NotImplemented
 
 
