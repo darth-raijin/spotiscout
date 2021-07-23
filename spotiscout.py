@@ -1,10 +1,17 @@
 from flask import Flask, request, render_template, Response
+from tracks import tracks
+from albums import albums
+from genres import genres
+from recent import recent
+
 
 app = Flask(__name__)
 
-
-database = Database()
-fake = Faker()
+# Registering blueprints
+app.register_blueprint(tracks)
+app.register_blueprint(albums)
+app.register_blueprint(genres)
+app.register_blueprint(recent)
 
 
 @app.route("/")

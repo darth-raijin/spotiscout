@@ -1,0 +1,98 @@
+<head>
+    
+    <script src="{{url_for('static', filename='js/budgetPost.js')}}"></script>
+</head>
+<div class="container is-fluid">
+    <form action="/dash/budget/edit" class="form" id ="budgetform" name ="budgetform" method="post">
+    {% for item in tableData %}
+    
+        <div class="columns budget-columns">
+                <input type="hidden" class="id" name="id" id = "id" value={{ item.get("id") }} readonly>
+            {% if item.get("incomes") %}
+            <div class="column">
+                <label for="incomes"><b>Incomes</b></label>
+                <input class="input amount" type="number" id="amount" pattern="/^[0-9]*(\.[0-9]{0,2})?$/" title="Only positive numbers, with period (.) as a delimiter. Example: 100 or 100.25" id="amount" value={{ item.get("incomes") }} placeholder="Enter amount"
+                    required>
+            </div>
+
+            <div class="column select is-fullwidth">
+                <label for="type"><b>Type</b></label>
+                <select id="type" class="type" required>
+                    <option value="incomes" selected>Incomes</option>
+                    <option value="expenses">Expenses</option>
+                    <option value="investments">Investments</option>
+                    <option value="savings">Savings</option>
+                </select>
+            </div>
+            {% elif item.get("expenses") %}
+            <div class="column">
+                <label for="expenses"><b>Expenses</b></label>
+                <input class="input amount" type="number" id="amount" pattern="/^[0-9]*(\.[0-9]{0,2})?$/" title="Only positive numbers, with period (.) as a delimiter. Example: 100 or 100.25" id="expenses" value={{ item.get("expenses") }}
+                    placeholder="Enter amount" required>
+            </div>
+            <div class="column select is-fullwidth">
+                <label for="type"><b>Type</b></label>
+                <select id="type" class="type" required>
+                    <option value="incomes">Incomes</option>
+                    <option value="expenses" selected>Expenses</option>
+                    <option value="investments">Investments</option>
+                    <option value="savings">Savings</option>
+                </select>
+            </div>
+            {% elif item.get("investments") %}
+            <div class="column">
+                <label for="Investments"><b>Investments</b></label>
+                <input class="input amount" type="number" id="amount" pattern="/^[0-9]*(\.[0-9]{0,2})?$/" title="Only positive numbers, with period (.) as a delimiter. Example: 100 or 100.25" value={{ item.get("investments") }} placeholder="Enter amount"
+                    required>
+            </div>
+            <div class="column select is-fullwidth">
+                <label for="type"><b>Type</b></label>
+                <select id="type" class="type"  required>
+                    <option value="incomes">Incomes</option>
+                    <option value="expenses">Expenses</option>
+                    <option value="investments" selected>Investments</option>
+                    <option value="savings">Savings</option>
+                </select>
+            </div>
+            {% elif item.get("savings") %}
+            <div class="column">
+                <label for="savings"><b>Savings</b></label>
+                <input class="input amount" type="number" id="amount" pattern="/^[0-9]*(\.[0-9]{0,2})?$/" title="Only positive numbers, with period (.) as a delimiter. Example: 100 or 100.25" id="savings" value={{ item.get("savings") }} placeholder="Enter amount"
+                    required>
+            </div>
+            <div class="column select is-fullwidth">
+                <label for="type"><b>Type</b></label>
+                <select id="type" class="type" required>
+                    <option value="incomes">Incomes</option>
+                    <option value="expenses">Expenses</option>
+                    <option value="investments">Investments</option>
+                    <option value="savings" selected>Savings</option>
+                </select>
+            </div>
+            {% endif %}
+            <div class="column">
+                <label for="category"><b>Category</b></label>
+                <input class="input category" type="text" id="category" placeholder="Enter category for item" value={{
+                    item.get("categories") }} required>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+
+    <div class="columns">
+        <div class="column">
+            <button class="button is-fullwidth is-primary post-budget" type ="button" onclick="postBudget()">Save budget</button>
+        </div>
+    </div>
+    
+    
+    <div class="columns">
+        <div class="column">
+            <button class="button is-fullwidth is-info" id ="addRowButton" onclick ="addRow()">Add another field</button>
+        </div>
+        <div class="column">
+            <a href="{{ url_for('budget.index')}}"><button class="button is-fullwidth is-danger">Cancel changes</button></a>
+        </div>
+
+    </div>
+</div>

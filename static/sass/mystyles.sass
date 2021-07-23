@@ -1,0 +1,72 @@
+@charset "utf-8";
+
+// Import a Google Font
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500&display=swap");
+// Set your brand colors
+$blue: #00509d;
+$dark-mode: #171717;
+$lighter-dark: #343434;
+$orange: #ff7d00;
+$beige-light: #8bb411;
+$beige-lighter: #eff0eb;
+
+// Update Bulma's global variables
+$family-sans-serif: "Montserrat", sans-serif;
+$grey-dark: #fff;
+$grey-light: $beige-light;
+$primary: $blue;
+$link: $orange;
+$widescreen-enabled: false;
+$fullhd-enabled: false;
+
+// Update some of Bulma's component variables
+$body-background-color: $dark-mode;
+$control-border-width: 2px;
+$input-border-color: transparent;
+$input-shadow: none;
+
+// customization
+$navbar-background-color: transparent;
+$navbar-item-hover-background-color: transparent;
+$navbar-item-hover-color: $link;
+$navbar-burger-color: $link;
+$text: #fff;
+
+// Hero
+$title-color: #fff;
+$title-hover-color: $link;
+$subtitle-color: $link;
+
+// footer
+$footer-background-color: transparent;
+$button-background-color: transparent;
+$button-hover-color: $text;
+$button-color: $text;
+$button-border-color: $blue;
+$button-hover-border-color: transparent;
+$button-ghost-background: transparent;
+$input-background-color: $lighter-dark;
+$input-color: #fff;
+$menu-item-hover-background-color: $blue;
+$menu-item-hover-color: white;
+
+
+.button:hover {
+    background-color: $blue;
+}
+.has-bg-img {
+    background-image: url("/public/logo512.png") center center;
+    background-size: cover;
+}
+
+// Import only what you need from Bulma
+@import "../../assets/bulma/sass/utilities/_all.sass";
+@import "../../assets/bulma/sass/base/_all.sass";
+@import "../../assets/bulma/sass/elements/button.sass";
+@import "../../assets/bulma/sass/elements/container.sass";
+@import "../../assets/bulma/sass/components/menu.sass";
+@import "../../assets/bulma/sass/elements/title.sass";
+@import "../../assets/bulma/sass/form/_all.sass";
+@import "../../assets/bulma/sass/components/navbar.sass";
+@import "../../assets/bulma/sass/layout/hero.sass";
+@import "../../assets/bulma/sass/layout/section.sass";
