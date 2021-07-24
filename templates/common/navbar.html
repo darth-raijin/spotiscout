@@ -1,7 +1,7 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <a class="navbar-item" href="https://bulma.io">
-            <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+        <a class="navbar-item" href="/">
+            <h1>SPOTISCOUT</h1>
         </a>
 
         <label for="toggler" class="navbar-burger burger">
@@ -13,12 +13,28 @@
 
     <div class="navbar-end">
         <div class="navbar-item">
+            <a class="navbar-item" href ="/tracks/top?range=alltime">
+                TRACKS
+              </a>
+              <a class="navbar-item" href ="/albums/top?range=alltime">
+                ALBUMS
+              </a>
+              <a class="navbar-item" href ="/genres/top?range=alltime">
+                GENRES
+              </a>
+              <a class="navbar-item" href ="/artists/top?range=alltime">
+                ARTISTS
+              </a>
+              <a class="navbar-item" href ="/recent/?item=tracks">
+                RECENT
+              </a>
             <div class="buttons">
-                <a class="button is-light" href ="dash/settings">
-                    {{ current_user.getUsername() }}
+               
+                <a class="button is-light" href ="/settings">
+                    <strong>SETTINGS</strong>
                 </a>
-                <a class="button is-danger" href = "dash/logout" >
-                    <strong>Sign out</strong>
+                <a class="button is-danger" href = "/logout" >
+                    <strong>SIGN OUT</strong>
                 </a>
             </div>
         </div>

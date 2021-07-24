@@ -1,16 +1,9 @@
 from flask import Blueprint, render_template
 
-recent = Blueprint('recent', __name__,
+recent = Blueprint('recent', __name__, url_prefix='/recent',
                         template_folder='templates')
 
-@recent.route('/albums')
-def recent_albums():
-    return NotImplemented
+@recent.route('/', defaults = {'item': 'tracks'})
+def recent_albums(item):
+    return item
 
-@recent.route('/tracks')
-def recent_tracks():
-    return NotImplemented
-
-@recent.route('/genres')
-def recent_genres():
-    return NotImplemented

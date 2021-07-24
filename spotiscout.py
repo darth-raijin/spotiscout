@@ -16,7 +16,11 @@ app.register_blueprint(recent)
 
 @app.route("/")
 def root():
-    return NotImplemented
+    return render_template("index.html")
+
+@app.route("/settings")
+def settings():
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
