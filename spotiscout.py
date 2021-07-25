@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from flask import Flask, request, render_template, url_for, session, redirect
 import spotipy
+import token_auth
 import time
 from spotipy.oauth2 import SpotifyOAuth
 from tracks import tracks
@@ -14,13 +15,6 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = NotImplemented
 app.config['SESSION_COOKIE_NAME'] = NotImplemented
-
-# Registering blueprints
-app.register_blueprint(tracks)
-app.register_blueprint(albums)
-app.register_blueprint(genres)
-app.register_blueprint(recent)
-
 
 @app.route("/")
 def root():
@@ -50,6 +44,27 @@ def auth_receiver():
 @app.route("/settings")
 def settings():
     return render_template("index.html")
+
+
+# TRACKS API
+@app.route('tracks/top', defaults = {'range': 'all_time'})
+def top_tracks(range):
+    return render_template("tracks.html")
+
+# GENRES API
+@app.route('genres/top', defaults = {'range': 'all_time'})
+def top_genres(range):
+    return NotImplemented
+
+# RECENT API
+@app.route('recent/', defaults = {'item': 'tracks'})
+def recent(item):
+    return item
+
+# ALBUMS API
+@app.route('albums/top', defaults = {'range': 'alltime'})
+def top_albums(range):
+    return NotImplemented
 
 
 def create_spotify_oauth():
