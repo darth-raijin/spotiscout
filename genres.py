@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from spotiscout import confirm_auth
+
 
 genres = Blueprint('genres', __name__, url_prefix='/genres',
                         template_folder='templates')

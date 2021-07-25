@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template
-from spotiscout import confirm_auth
+from flask import Blueprint, render_template, session
+
 
 tracks = Blueprint('tracks', __name__, url_prefix='/tracks',
                         template_folder='templates')
