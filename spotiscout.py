@@ -14,8 +14,6 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = NotImplemented
 app.config['SESSION_COOKIE_NAME'] = NotImplemented
-client_id = os.getenv('CLIENT_ID')
-client_secret = os.getenv('CLIENT_SECRET')
 
 # Registering blueprints
 app.register_blueprint(tracks)
