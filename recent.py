@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from spotiscout import confirm_auth
 
 recent = Blueprint('recent', __name__, url_prefix='/recent',
                         template_folder='templates')

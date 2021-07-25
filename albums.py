@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from spotiscout import confirm_auth
 
 albums = Blueprint('albums', __name__, url_prefix='/albums',
                         template_folder='templates')

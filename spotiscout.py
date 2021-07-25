@@ -26,7 +26,8 @@ app.register_blueprint(recent)
 
 @app.route("/")
 def root():
-    return render_template("index.html")
+    return render_template("index.html" )
+    # TODO Pass data, based on token validity, call confirm_auth()
 
 @app.route("/login")
 def login():
@@ -60,6 +61,13 @@ def create_spotify_oauth():
         redirect_uri = url_for("auth_receiver", _external=True),
         scope="user-library-read"
 )
+
+def confirm_auth():
+    session['token_info'], authorized = get_token()
+    session.modified = True
+    if not authorized:
+        return redirect(url_for("root"))
+    return True
 
 def get_token():
     token_valid = False
