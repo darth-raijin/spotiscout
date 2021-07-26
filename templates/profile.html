@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content%}
+<section class="hero is-large is-info">
+    <div class="hero-body">
+      <p class="title">
+        {{session["user_info"]["display_name"]}}
+      </p>
+      <p class="subtitle">
+        Followers: {{session["user_info"]["follower_total"]}}
+      </p>
+    </div>
+  </section>
+{% endblock%}
