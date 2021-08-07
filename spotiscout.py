@@ -1,151 +1,117 @@
-from dotenv import load_dotenv
 import os
-from flask import Flask, request, render_template, url_for, session, redirect
+from flask import Flask, session, request, redirect, render_template
+from flask_session import Session
+from dotenv import load_dotenv
 import spotipy
-import time
-from spotipy.oauth2 import SpotifyOAuth
-
+import uuid
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key =  "Doflamingo"
-app.config['SESSION_COOKIE_NAME'] = "Quijote"
+app.config['SECRET_KEY'] = os.urandom(64)
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = './.flask_session/'
+Session(app)
 
-@app.route("/")
-def root():
-    return render_template("index.html")
-    # TODO Pass data, based on token validity, call confirm_auth()
-
-@app.route("/login")
-def login():
-    spotify_oauth = create_spotify_oauth() 
-    spotify_auth_url = spotify_oauth.get_authorize_url()
-    return redirect(spotify_auth_url)
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("root"))
-
-@app.route("/profile")
-def user_profile():
-    return render_template("profile.html")
-
-@app.context_processor
-def is_authenticated():
-    return dict(is_auth = confirm_auth())
-
-@app.route("/session")
-def get_session():
-    print(session)
-    return "hell"
-
-@app.route("/me")
-def get_user_profile():
-    confirm_auth()
-    sp = spotipy.Spotify(auth = session.get("token_info").get("access_token"))
-    # TODO Create profile, based on current_user()
-    # Pass External URL (Spotify), image URL, and Display Name to Template
-    
-    spotify_profile = sp.current_user()
-    profile_dict = {
-        "display_name": spotify_profile["display_name"],
-        "spotify_url": spotify_profile["external_urls"]["spotify"],
-        "follower_total": spotify_profile["followers"]["total"],
-        "image_url": spotify_profile["images"][0]["url"],
-        "top_artist": None
-    }
-
-    session["user_info"] = profile_dict
-    return session["user_info"]
-
-@app.route("/redirect")
-def auth_receiver():
-    print("Redirect received!")
-    spotify_oauth = create_spotify_oauth()
-    session.clear()
-    code = request.args.get('code')
-    token_info = spotify_oauth.get_access_token(code)
-    session["token_info"] = token_info
-    return redirect(url_for("root"))
-
-@app.route("/settings")
-def settings():
-    return render_template("index.html")
-
-
-# TRACKS API
-@app.route('/tracks/top', defaults = {'range': 'all_time'})
-def top_tracks(range):
-    confirm_auth()
-    spotify = spotipy.Spotify(auth = session.get("token_info").get("access_token"))
-
-    results = []
-    iter = 0
-    while True:
-        offset = iter * 50
-        iter += 1
-        curGroup = spotify.current_user_saved_tracks(limit=50, offset=offset)['items']
-        for idx, item in enumerate(curGroup):
-            track = item['track']
-            val = track['name'] + " - " + track['artists'][0]['name']
-            results += [val]
-        if (len(curGroup) < 50):
-            break
-
-
-    return spotify.current_user_saved_tracks(limit=50, offset=offset)['items']
-
-# GENRES API
-@app.route('/genres/top', defaults = {'range': 'all_time'})
-def top_genres(range):
-    return render_template("genres.html")
-
-# RECENT API
-@app.route('/recent/', defaults = {'item': 'tracks'})
-def recent(item):
-    return render_template("recent.html")
-
-# ALBUMS API
-@app.route('/albums/top', defaults = {'range': 'alltime'})
-def top_albums(range):
-    return render_template("album.html")
-
-
-def create_spotify_oauth():
-    return SpotifyOAuth(
-        client_id = os.getenv('CLIENT_ID'),
-        client_secret = os.getenv('CLIENT_SECRET'),
-        redirect_uri = url_for("auth_receiver", _external=True),
-        scope="user-library-read user-read-recently-played user-top-read playlist-modify-public"
+# Set SpotiPy values in environment
+app.config.update(
+    SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID"),
+    SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET"),
+    SPOTIFY_REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
 )
 
-def confirm_auth():
-    session['token_info'], authorized = get_token()
-    session.modified = True
-    if not authorized:
-        return False
-    return True
+caches_folder = './.spotify_caches/'
+if not os.path.exists(caches_folder):
+    os.makedirs(caches_folder)
 
-def get_token():
-    token_valid = False
-    token_info = session.get("token_info", {})
+def session_cache_path():
+    return caches_folder + session.get('uuid')
 
-    if not (session.get('token_info', False)):
-        token_valid = False
-        return token_info, token_valid
+@app.route('/')
+def index():
+    if not session.get('uuid'):
+        # Visitor gets assigned a random UUID if they don't have one.
+        session['uuid'] = str(uuid.uuid4())
 
-    # Check if session token has expired
-    now = int(time.time())
-    is_token_expired = session.get('token_info').get('expires_at') - now < 60
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-read-currently-playing playlist-modify-private',
+                                                cache_handler =cache_handler, 
+                                                show_dialog=True)
 
-    if (is_token_expired):
-        spotify_oauth = create_spotify_oauth()
-        token_info = spotify_oauth.refresh_access_token(session.get('token_info').get('refresh_token'))
+    # If user gets redirected from Spotify, they will have "code" in payload
+    if request.args.get("code"):
+        auth_manager.get_access_token(request.args.get("code"))
+        return redirect('/')
 
-    token_valid = True
-    return token_info, token_valid
+    # If no token exists, user will be shown default index.html
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        auth_url = auth_manager.get_authorize_url()
+        return render_template("index.html")
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # User is signed in, and view with user details will be displayed
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    session["user"] = spotify.me()
+
+    return render_template("index.html")
+
+@app.route('/profile')
+def profile():
+    spotify = confirm_authentication()
+    return render_template("profile.html")
+
+
+@app.route('/logout')
+def logout():
+    try:
+        # Remove the CACHE file (.cache-test) so that a new user can authorize.
+        os.remove(session_cache_path())
+        session.clear()
+    except OSError as e:
+        print ("Error: %s - %s." % (e.filename, e.strerror))
+    return redirect('/')
+
+
+@app.route('/playlists')
+def playlists():
+    spotify, auth_manager = confirm_authentication()
+
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    return spotify.current_user_playlists()
+
+@app.route('/tracks/top', defaults = {'range': 'all_time'})
+def top_tracks(range):
+    confirm_authentication()
+
+@app.route('/genres/top', defaults = {'range': 'all_time'})
+def top_genres(range):
+    confirm_authentication()
+
+@app.route('/albums/top', defaults = {'range': 'all_time'})
+def top_albums(range):
+    confirm_authentication()
+
+@app.route('/artists/top', defaults = {'range': 'all_time'})
+def top_albums(range):
+    confirm_authentication()
+
+@app.route('/recent', defaults = {'item': 'tracks'})
+def recent(item):
+    confirm_authentication()
+
+# USED FOR TESTING PURPOSES TODO DELETE AFTER
+@app.route('/me')
+def current_user():
+    spotify = confirm_authentication()
+
+    return spotify.current_user()
+
+def confirm_authentication():
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    return spotipy.Spotify(auth_manager=auth_manager), auth_manager
+
+if __name__ == '__main__':
+    app.run(threaded=True, port=int(os.environ.get("PORT",
+                                                   os.environ.get("SPOTIPY_REDIRECT_URI", 5000).split(":")[-1])))

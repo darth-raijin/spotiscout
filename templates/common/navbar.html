@@ -28,15 +28,13 @@
       <a class="navbar-item" href="/recent/?item=tracks">
         RECENT
       </a>
-      {% if session["token_info"] %}
-      <a class="navbar-item" href="/profile">
-        {{session["user_info"]["display_name"]}}
-      </a>
-        {% endif %}
       
       <div class="buttons">
         
-        {% if session["token_info"] %}
+        {% if session["user"] %}
+        <a class="button is-link" href="/profile">
+          {{session["user"]["display_name"]}}
+        </a>
         <a class="button is-light" href="/settings">
           <strong>SETTINGS</strong>
         </a>

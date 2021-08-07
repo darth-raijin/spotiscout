@@ -11,6 +11,8 @@
 *.sln.docstates
 *.env
 brainstorm.py
+.flask_session/
+.spotify_caches/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

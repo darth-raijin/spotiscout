@@ -3,10 +3,10 @@
 <section class="hero is-large is-info">
     <div class="hero-body">
       <p class="title">
-        {{session["user_info"]["display_name"]}}
+        {{session["user"]["display_name"]}}
       </p>
       <p class="subtitle">
-        Followers: {{session["user_info"]["follower_total"]}}
+        Followers: {{session["user"]["followers"]["total"]}}
       </p>
     </div>
   </section>
