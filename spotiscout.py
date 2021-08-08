@@ -29,24 +29,24 @@ def session_cache_path():
 
 @app.route('/')
 def index():
-    if not session.get('uuid'):
+    if not session.get("uuid"):
         # Visitor gets assigned a random UUID if they don't have one.
         session['uuid'] = str(uuid.uuid4())
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-read-currently-playing playlist-modify-private',
-                                                cache_handler =cache_handler, 
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope="user-read-currently-playing playlist-modify-private",
+                                                cache_handler = cache_handler, 
                                                 show_dialog=True)
 
     # If user gets redirected from Spotify, they will have "code" in payload
     if request.args.get("code"):
         auth_manager.get_access_token(request.args.get("code"))
-        return redirect('/')
+        return redirect("/")
 
     # If no token exists, user will be shown default index.html
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         auth_url = auth_manager.get_authorize_url()
-        return render_template("index.html")
+        return render_template("index.html", auth_url = auth_url)
 
     # User is signed in, and view with user details will be displayed
     spotify = spotipy.Spotify(auth_manager=auth_manager)
@@ -91,7 +91,7 @@ def top_albums(range):
     confirm_authentication()
 
 @app.route('/artists/top', defaults = {'range': 'all_time'})
-def top_albums(range):
+def top_artists(range):
     confirm_authentication()
 
 @app.route('/recent', defaults = {'item': 'tracks'})
