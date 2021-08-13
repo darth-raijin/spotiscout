@@ -1,13 +1,44 @@
 {% extends 'base.html' %}
 {% block content%}
-<section class="hero is-large is-info">
-    <div class="hero-body">
-      <p class="title">
-        {{session["user"]["display_name"]}}
-      </p>
-      <p class="subtitle">
-        Followers: {{session["user"]["followers"]["total"]}}
-      </p>
+<section class="hero is-primary">
+      <div class="hero-body">
+        <div class="container ">
+          <p class="title">
+            {{session["user"]["display_name"]}}
+          </p>
+          <div class="block">
+          </div>
+          <div class="subtitle">
+            <a class="button is-black" href = {{session["user"]["external_urls"]["spotify"]}}>Visit on Spotify</a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
+  <div class="block">
+  </div>
+  <nav class="level">
+    <div class="level-item has-text-centered">
+      <div>
+        <p class="heading">FOLLOWERS</p>
+        <p class="title">{{session["user"]["followers"]["total"]}}</p>
+      </div>
+    </div>
+    <div class="level-item has-text-centered">
+      <div>
+        <p class="heading">MY SONGS</p>
+        <p class="title">{{session["user"]["track_count"]}}</p>
+      </div>
+    </div>
+    <div class="level-item has-text-centered">
+      <div>
+        <p class="heading">MY PRIVATE PLAYLISTS</p>
+        <p class="title">{{session["user"]["playlist_count"]}}</p>
+      </div>
+    </div>
+  </nav>
+
+  <div>
+    {{session["user"]}}
+  </div>
 {% endblock%}
