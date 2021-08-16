@@ -32,25 +32,35 @@ def session_cache_path():
 
 @app.route('/')
 def index():
+    if not session.get('user'):
+        session.clear()
+   
     if not session.get("uuid"):
         # Visitor gets assigned a random UUID if they don't have one.
         session['uuid'] = str(uuid.uuid4())
+    
+
+
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(scope = scope,
                                                 cache_handler = cache_handler, 
                                                 show_dialog=True)
 
+
     # If user gets redirected from Spotify, they will have "code" in payload
     if request.args.get("code"):
-        print("i am here")
+        
         auth_manager.get_access_token(request.args.get("code"))
         # await asyncio.gather(        get_artist_background(),
         # get_total_playlists(),
         # get_total_tracks())
+
         get_artist_background()
         get_total_playlists()
         get_total_tracks()
+        get_top_artists()
+        get_top_tracks()
 
         return render_template("index.html")
 
@@ -64,57 +74,22 @@ def index():
     print("yessirski")
     return render_template("index.html")
 
-def get_artist_background():
-    print("Get background stated")
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    session["user"] = spotify.me()
-
-    # Set top artist image, to use for background in profile
-    session["user"]["top_artist_background"] = top_artist_background(spotify.current_user_top_artists(time_range="long_term", limit=1))
-    print("Get background finished")
-
-
-def get_total_tracks():
-    print("Get tracks stated")
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    track_count = 0
-    saved_tracks = spotify.current_user_saved_tracks(limit = 50)
-
-    while saved_tracks['next']:
-        saved_tracks = spotify.next(saved_tracks)
-        for item in saved_tracks['items']:
-            track_count += 1
-
-    session["user"]["track_count"] = track_count
-    print("Get track finish")
-
-
-def get_total_playlists():
-    print("Get playlists stated")
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    playlist_count = 0
-    playlists = spotify.current_user_playlists(limit=50)
-
-    while playlists['next']:
-        playlists = spotify.next(playlists)
-        for item in playlists['items']:
-            playlist_count += 1
-
-    session["user"]["playlist_count"] = playlist_count
-    print("get playlists finish")
-
-
-
 @app.route('/profile')
 def profile():
-    spotify = confirm_authentication()
-    return render_template("profile.html")
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    artists = []
+    tracks =  []
+
+    for artist in session["user"]["long_artists"][:3]:
+        artists.append(artist)
+
+    for track in session["user"]["long_tracks"][:3]:
+        tracks.append(track)
+
+
+    return render_template("profile.html", artists = artists, tracks = tracks)
 
 
 @app.route('/logout')
@@ -155,6 +130,8 @@ def top_artists(range):
 def recent(item):
     confirm_authentication()
 
+# Functions for getting profile data
+
 def top_artist_background(item: dict):
     """Gets the URL for the artist image
 
@@ -166,6 +143,180 @@ def top_artist_background(item: dict):
     """
     return item.get("items")[0]["images"][0]["url"]
 
+def get_artist_background():
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    session["user"] = spotify.me()
+
+    # Set top artist image, to use for background in profile
+    session["user"]["top_artist_background"] = top_artist_background(spotify.current_user_top_artists(time_range="long_term", limit=1))
+
+
+def get_total_tracks():
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    track_count = 0
+    saved_tracks = spotify.current_user_saved_tracks(limit = 50)
+
+    while saved_tracks['next']:
+        saved_tracks = spotify.next(saved_tracks)
+        for item in saved_tracks['items']:
+            track_count += 1
+
+    session["user"]["track_count"] = track_count
+
+
+def get_total_playlists():
+    print("Get playlists stated")
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    playlist_count = 0
+    playlists = spotify.current_user_playlists(limit=50)
+
+    while playlists['next']:
+        playlists = spotify.next(playlists)
+        for item in playlists['items']:
+            playlist_count += 1
+
+    session["user"]["playlist_count"] = playlist_count
+    print("get playlists finish")
+
+def get_top_artists():
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+
+
+    short_artists = []
+    medium_artists = []
+    long_artists = []
+
+    short_term = spotify.current_user_top_artists(time_range = "short_term", limit=50)
+    medium_term = spotify.current_user_top_artists(time_range = "medium_term", limit=50)
+    long_term = spotify.current_user_top_artists(time_range = "long_term", limit=50)
+
+    rank = 1
+
+    for item in short_term['items']:
+        artist = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["images"][0]["url"], # TODO FIX IMAGE URL
+            "name": item["name"],
+            "rank": rank
+        }
+        short_artists.append(artist)
+        rank +=1
+    rank = 1
+
+    for item in medium_term['items']:
+        artist = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["images"][0]["url"],
+            "name": item["name"],
+            "rank": rank
+        }
+        medium_artists.append(artist)
+        rank +=1
+    rank = 1
+
+    for item in long_term['items']:
+        artist = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["images"][0]["url"],
+            "name": item["name"],
+            "rank": rank
+        }
+        long_artists.append(artist)
+        rank +=1
+    rank = 1
+
+    session["user"]["short_artists"] = short_artists
+    session["user"]["medium_artists"] = medium_artists
+    session["user"]["long_artists"] = long_artists
+
+def get_top_tracks():
+    #TODO POLISH AND FINISH
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    short_tracks = []
+    medium_tracks = []
+    long_tracks = []
+
+    short_term = spotify.current_user_top_tracks(time_range = "short_term", limit=50)
+    medium_term = spotify.current_user_top_tracks(time_range = "medium_term", limit=50)
+    long_term = spotify.current_user_top_tracks(time_range = "long_term", limit=50)
+
+    session["user"]["genres"] = {}
+
+    rank = 1
+    for item in short_term['items']:
+        track = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["album"]["images"][0]["url"],
+            "name": item["name"],
+            "artist": item["album"]["artists"][0]["name"],
+            "artist_url": item["artists"][0]["external_urls"]["spotify"],
+            "rank": rank
+        }
+        short_tracks.append(track)
+        rank +=1
+    
+    rank = 1
+    for item in medium_term['items']:
+        track = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["album"]["images"][0]["url"],
+            "name": item["name"],
+            "artist": item["album"]["artists"][0]["name"],
+            "artist_url": item["artists"][0]["external_urls"]["spotify"],
+            "rank": rank
+        }
+        medium_tracks.append(track)
+        rank +=1
+    
+    rank = 1
+    for item in long_term['items']:
+        track = {
+            "external_url": item['external_urls']["spotify"],
+            "image_url": item["album"]["images"][0]["url"],
+            "name": item["name"],
+            "artist": item["album"]["artists"][0]["name"],
+            "artist_url": item["artists"][0]["external_urls"]["spotify"],
+            "rank": rank
+        }
+        long_tracks.append(track)
+        rank +=1
+    rank = 1
+
+    session["user"]["short_tracks"] = short_tracks
+    session["user"]["medium_tracks"] = medium_tracks
+    session["user"]["long_tracks"] = long_tracks
+
+def extract_genres(item: dict):
+    genres = []
+
+    for genre in item.get("genres"):
+        genres.append(genre)
+        if genre not in session["user"]["genres"]:
+            session["user"]["genres"][genre] = 1
+
+        if genre in session["user"]["genres"]:
+            session["user"]["genres"][genre] += 1
+
+
+    return genres
+
+def calculate_genres(genres: list):
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    genres = {}
+
+    #TODO Loop over top 50 artists, fetch
 
 def confirm_authentication():
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())

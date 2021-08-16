@@ -1,44 +1,127 @@
 {% extends 'base.html' %}
 {% block content%}
 <section class="hero is-primary">
-      <div class="hero-body">
-        <div class="container ">
-          <p class="title">
-            {{session["user"]["display_name"]}}
-          </p>
-          <div class="block">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <p class="title">
+        {{session["user"]["display_name"]}}
+      </p>
+      <div class="block">
+      </div>
+      <div class="subtitle">
+        <a class="button is-black" href={{session["user"]["external_urls"]["spotify"]}}>Visit on Spotify</a>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+<div class="block">
+</div>
+<nav class="level">
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">FOLLOWERS</p>
+      <p class="title">{{session["user"]["followers"]["total"]}}</p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">MY SONGS</p>
+      <p class="title">{{session["user"]["track_count"]}}</p>
+    </div>
+  </div>
+  <div class="level-item has-text-centered">
+    <div>
+      <p class="heading">MY PRIVATE PLAYLISTS</p>
+      <p class="title">{{session["user"]["playlist_count"]}}</p>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <h1 class="title">TOP 3 ARTISTS</h1>
+  <h2 class="subtitle">
+    Out of all artists, these are your favorite!
+  </h2>
+  <div class="columns">
+    {% for item in artists %}
+    <div class="column">
+      <div class="card">
+        <div class="card-image">
+          <figure class="image is-square">
+            <a href={{item.get("external_url")}}>
+              <img src={{item.get("image_url")}} alt="{{item.get(' name')}} Spotify image ">
+            </a>
+            </figure>
           </div>
-          <div class="subtitle">
-            <a class="button is-black" href = {{session["user"]["external_urls"]["spotify"]}}>Visit on Spotify</a>
-          </div>
+          <div class=" card-content">
+              <div class="media">
+                <div class="media-content">
+                    <a href="{{item.get('external_url')}}">
+                    <button class="button is-outlined">
+                      <p class="title is-4">#{{item.get("rank")}} {{item.get("name")}}</p>
+                    </button>
+                  </a>
+                </div>
+              </div>
+
+
         </div>
       </div>
     </div>
-  </section>
-  <div class="block">
+    {% endfor %}
   </div>
-  <nav class="level">
-    <div class="level-item has-text-centered">
-      <div>
-        <p class="heading">FOLLOWERS</p>
-        <p class="title">{{session["user"]["followers"]["total"]}}</p>
-      </div>
-    </div>
-    <div class="level-item has-text-centered">
-      <div>
-        <p class="heading">MY SONGS</p>
-        <p class="title">{{session["user"]["track_count"]}}</p>
-      </div>
-    </div>
-    <div class="level-item has-text-centered">
-      <div>
-        <p class="heading">MY PRIVATE PLAYLISTS</p>
-        <p class="title">{{session["user"]["playlist_count"]}}</p>
-      </div>
-    </div>
-  </nav>
+</section>
 
-  <div>
-    {{session["user"]}}
+
+
+<section class="section">
+  <h1 class="title">TOP 3 TRACKS</h1>
+  <h2 class="subtitle">
+    Take a look at your top 3 main tracks at the moment!
+  </h2>
+  <div class="columns">
+    {% for item in tracks %}
+    <div class="column">
+      <div class="card">
+        <div class="card-image">
+          <figure class="image is-square">
+            <a href={{item.get("external_url")}}>
+              <img src={{item.get("image_url")}} alt="Placeholder image">
+            </a>
+          </figure>
+        </div>
+        <div class="card-content">
+          <div class="media">
+            <div class="media-content">
+              <a href={{item.get("external_url")}}>
+              <button class="button is-outlined" >
+                <p class="title is-4">#{{item.get("rank")}} {{item.get("name")}}</p>
+              </button>
+            </a>
+            </div>
+          </div>
+          <!-- Bottom button for artist-->
+          <div class="content">
+            <a href={{item.get("artist_url")}}>
+              <button class="button is-outlined">
+                <p class="subtitle is-6">{{item.get("artist")}}</p>
+              </button>
+            </a>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+</section>
+
+<section class="section">
+  <h1 class="title">GENRES</h1>
+  <h2 class="subtitle">
+    Take a look at your main genres. You sure have nice taste!
+  </h2>
+</section>
 {% endblock%}
