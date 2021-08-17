@@ -88,6 +88,7 @@ def profile():
     for track in session["user"]["long_tracks"][:3]:
         tracks.append(track)
 
+    # TODO Sort Chart.js for Genres
 
     return render_template("profile.html", artists = artists, tracks = tracks)
 

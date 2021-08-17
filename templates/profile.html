@@ -104,7 +104,7 @@
           <!-- Bottom button for artist-->
           <div class="content">
             <a href={{item.get("artist_url")}}>
-              <button class="button is-outlined">
+              <button class="button is-outlined is-info">
                 <p class="subtitle is-6">{{item.get("artist")}}</p>
               </button>
             </a>
@@ -123,5 +123,7 @@
   <h2 class="subtitle">
     Take a look at your main genres. You sure have nice taste!
   </h2>
+  <canvas id="myChart" width="400" height="400"></canvas>
 </section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 {% endblock%}
