@@ -90,7 +90,7 @@ def profile():
 
     # TODO Sort Chart.js for Genres
 
-    return render_template("profile.html", artists = artists, tracks = tracks)
+    return render_template("profile.html", artists = artists, tracks = tracks, genres = session["user"]["genres"])
 
 
 @app.route('/logout')
@@ -113,7 +113,10 @@ def playlists():
 
 @app.route('/tracks/top', defaults = {'range': 'all_time'})
 def top_tracks(range):
-    confirm_authentication()
+    range = request.args.get('range')
+    print(range)
+    
+    return render_template('index.html')
 
 @app.route('/genres/top', defaults = {'range': 'all_time'})
 def top_genres(range):
@@ -255,15 +258,18 @@ def get_top_tracks():
 
     rank = 1
     for item in short_term['items']:
+        print(item)
         track = {
             "external_url": item['external_urls']["spotify"],
             "image_url": item["album"]["images"][0]["url"],
             "name": item["name"],
             "artist": item["album"]["artists"][0]["name"],
             "artist_url": item["artists"][0]["external_urls"]["spotify"],
-            "rank": rank
+            "rank": rank,
+            "genres": extract_genres(item)
         }
         short_tracks.append(track)
+        print(track)
         rank +=1
     
     rank = 1
@@ -274,7 +280,8 @@ def get_top_tracks():
             "name": item["name"],
             "artist": item["album"]["artists"][0]["name"],
             "artist_url": item["artists"][0]["external_urls"]["spotify"],
-            "rank": rank
+            "rank": rank,
+            "genre": extract_genres(item)
         }
         medium_tracks.append(track)
         rank +=1
@@ -287,7 +294,8 @@ def get_top_tracks():
             "name": item["name"],
             "artist": item["album"]["artists"][0]["name"],
             "artist_url": item["artists"][0]["external_urls"]["spotify"],
-            "rank": rank
+            "rank": rank,
+            "genre": extract_genres(item)
         }
         long_tracks.append(track)
         rank +=1
@@ -299,25 +307,20 @@ def get_top_tracks():
 
 def extract_genres(item: dict):
     genres = []
+    try: 
+        for genre in item.get("genres"):
+            genres.append(genre)
+            if genre not in session["user"]["genres"]:
+                session["user"]["genres"][genre] = 1
 
-    for genre in item.get("genres"):
-        genres.append(genre)
-        if genre not in session["user"]["genres"]:
-            session["user"]["genres"][genre] = 1
-
-        if genre in session["user"]["genres"]:
-            session["user"]["genres"][genre] += 1
+            if genre in session["user"]["genres"]:
+                session["user"]["genres"][genre] += 1
+        return genres
+    except:
+        return None
 
 
-    return genres
 
-def calculate_genres(genres: list):
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    genres = {}
-
-    #TODO Loop over top 50 artists, fetch
 
 def confirm_authentication():
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
