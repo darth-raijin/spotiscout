@@ -32,9 +32,6 @@
         <a class="button is-link" href="/profile">
           {{session["user"]["display_name"]}}
         </a>
-        <a class="button is-light" href="/settings">
-          <strong>SETTINGS</strong>
-        </a>
         <a class="button is-danger" href="/logout">
           <strong>SIGN OUT</strong>
         </a>
@@ -50,8 +47,9 @@
   </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
 <section class="section">
-  {% if messages %}
+
     {% for category, message in messages %}
     {% if category == "success"%}
     <div class="notification is-primary">
@@ -62,6 +60,7 @@
       {{message}}
     </div>
     {% endfor %}
-  {% endif %}
+
 </section>
+{% endif %}
 {% endwith %}
