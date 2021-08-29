@@ -216,7 +216,7 @@ def top_artists(range):
 
     if range == "short":
         short_button = ""
-        tracks = pair_tracks(session["user"]["short_artists"])
+        artists = pair_tracks(session["user"]["short_artists"])
 
 
     return render_template('artists.html', short_button=short_button, medium_button=medium_button, long_button=long_button, artists = artists, current = range)
