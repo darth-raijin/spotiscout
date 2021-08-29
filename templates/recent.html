@@ -1,4 +1,42 @@
 {% extends 'base.html' %}
 {% block content%}
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <p class="title">
+        LATEST 50 TRACKS
+      </p>
 
+    </div>
+  </div>
+  </div>
+</section>
+<section class="section">
+  {% for item in recent %}
+  <div class="card">
+    <div class="card-content">
+      <div class="media">
+        <div class="media-left">
+          <a href={{item.get("external_url")}}>
+            <figure class="image is-128x128">
+              <img src={{item.get("image_url")}} alt="Placeholder image">
+            </figure>
+          </a>
+        </div>
+        <div class="media-content">
+          <a href={{item.get("external_url")}}>
+            <p class="title is-4">{{item.get("name")}}</p>
+          </a>
+          <a href={{item.get("artist_url")}}>
+            <p class="subtitle is-5">{{item.get("artist")}}</p>
+          </a>
+          <a href={{item.get("album_url")}}>
+            <p class="subtitle is-6">Album: {{item.get("album_name")}}</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor%}
+</section>
 {% endblock%}
