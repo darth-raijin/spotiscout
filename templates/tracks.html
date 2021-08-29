@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block content%}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <p class="title">
+                TOP 50 TRACKS
+            </p>
+
+        </div>
+    </div>
+    </div>
+</section>
+<div class="block">
+</div>
+<!-- Button group for setting range -->
+<nav class="level">
+    <div class="level-item has-text-centered">
+        <div>
+            <p class="heading">Select time range and see the magic!</p>
+            <div class="field has-addons">
+                <p class="control">
+                    <a href="/tracks/top?range=short">
+                        <button class="button is-info {{short_button}}">
+                            <span>Last 4 weeks</span>
+                        </button>
+                </p>
+                </a>
+                <p class="control">
+                    <a href="/tracks/top?range=medium">
+                        <button class="button is-info {{medium_button}}">
+                            <span>Last 6 months</span>
+                        </button>
+                    </a>
+                </p>
+                <p class="control">
+                    <a href="/tracks/top?range=alltime">
+                        <button class="button is-info {{long_button}}">
+                            <span>All time</span>
+                        </button>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<nav class="level">
+  <div class="level-item has-text-centered">
+      <div>
+          <div class="field has-addons">
+              <p class="control">
+                  <a href="/tracks/top?range=alltime&save={{current}}">
+                      <button class="button is-info">
+                          <span>Create Playlist</span>
+                      </button>
+                  </a>
+              </p>
+          </div>
+      </div>
+  </div>
+  
+</nav>
+
+<!------------------------------ Main cards for top tracks ---------------------------------->
+<section class="section">
+{% for item in tracks %}
+<div class="columns">
+{% for track in item %}
+    <div class="column">
+      <div class="card">
+        <div class="card-image">
+          <figure class="image is-square">
+            <a href={{track.get("external_url")}}>
+              <img src={{track.get("image_url")}} alt="Placeholder image">
+            </a>
+          </figure>
+        </div>
+        <div class="card-content">
+          <div class="media">
+            <div class="media-content">
+              <a href={{track.get("external_url")}}>
+                <p class="title is-4">#{{track.get("rank")}} {{track.get("name")}}</p>
+
+            </a>
+            </div>
+          </div>
+          <!-- Bottom button for artist-->
+          <div class="content">
+            <a href={{track.get("artist_url")}}>
+              <button class="button is-outlined is-info">
+                <p class="subtitle is-6">{{track.get("artist")}}</p>
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+</div>
+{% endfor %}
+</section>
+
+{% endblock%}

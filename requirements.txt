@@ -2,3 +2,4 @@ flask
 mysql-connector-python
 requests
 response
+spotipy

@@ -1,27 +1,67 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="https://bulma.io">
-            <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <h1>SPOTISCOUT</h1>
+    </a>
+
+    <label for="toggler" class="navbar-burger burger">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </label>
+  </div>
+
+  <div class="navbar-end">
+    <div class="navbar-item">
+      <a class="navbar-item" href="/tracks/top?range=alltime">
+        TRACKS
+      </a>
+      <a class="navbar-item" href="/genres/top?range=alltime">
+        GENRES
+      </a>
+      <a class="navbar-item" href="/artists/top?range=alltime">
+        ARTISTS
+      </a>
+      <a class="navbar-item" href="/recent">
+        RECENT
+      </a>
+      
+      <div class="buttons">
+        
+        {% if session["user"] %}
+        <a class="button is-link" href="/profile">
+          {{session["user"]["display_name"]}}
         </a>
+        <a class="button is-light" href="/settings">
+          <strong>SETTINGS</strong>
+        </a>
+        <a class="button is-danger" href="/logout">
+          <strong>SIGN OUT</strong>
+        </a>
+        {% else %}
+        <a class="button is-primary has-tooltip-bottom" href = {{auth_url}}>
+          <strong>SIGN IN</strong>
+        </a>
+        {% endif %}
 
-        <label for="toggler" class="navbar-burger burger">
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-        </label>
+      </div>
     </div>
-
-    <div class="navbar-end">
-        <div class="navbar-item">
-            <div class="buttons">
-                <a class="button is-light" href ="dash/settings">
-                    {{ current_user.getUsername() }}
-                </a>
-                <a class="button is-danger" href = "dash/logout" >
-                    <strong>Sign out</strong>
-                </a>
-            </div>
-        </div>
-    </div>
-    </div>
+  </div>
+  </div>
 </nav>
+{% with messages = get_flashed_messages(with_categories=true) %}
+<section class="section">
+  {% if messages %}
+    {% for category, message in messages %}
+    {% if category == "success"%}
+    <div class="notification is-primary">
+      {% endif %}
+      {% if category == "error" %}
+      <div class="notification is-danger">
+        {% endif %}
+      {{message}}
+    </div>
+    {% endfor %}
+  {% endif %}
+</section>
+{% endwith %}
