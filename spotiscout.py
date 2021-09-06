@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from datetime import date
 import spotipy
 import uuid
-import asyncio
-import argparse
+import random
+
 
 load_dotenv()
 
@@ -73,11 +73,8 @@ def profile():
 
     artists = []
     tracks =  []
-    try: 
-        if session["user"]["track_count"] is None:
-            get_total_tracks()
-    except:
-        get_total_tracks()
+    genres = []
+    genre_count = 0
 
     for artist in session["user"]["long_artists"][:3]:
         artists.append(artist)
@@ -85,9 +82,23 @@ def profile():
     for track in session["user"]["long_tracks"][:3]:
         tracks.append(track)
 
+    for genre in session["user"]["genres"]:
+        genre_count += 1
+    session["user"]["genres"] = {k: v for k, v in sorted(session["user"]["genres"].items(), key=lambda item: item[1], reverse = True)}
+
+    iter_count = 0
+    for genre in session["user"]["genres"]:
+        if iter_count < 3:
+            genres.append(genre.capitalize())
+            iter_count += 1
+        
+        if iter_count >= 3:
+            break
+
+    print(session["user"]["genres"])
     # TODO Sort Chart.js for Genres
 
-    return render_template("profile.html", artists = artists, tracks = tracks, genres = session["user"]["genres"])
+    return render_template("profile.html", artists = artists, tracks = tracks, genre_count = genre_count, genres = genres)
 
 
 @app.route('/logout')
@@ -181,9 +192,18 @@ def pair_tracks(items: list):
     return tracks
 
 
-@app.route('/genres/top', defaults = {'range': 'all_time'})
-def top_genres(range):
-    confirm_authentication()
+@app.route('/genres')
+def top_genres():
+    colors = []
+    labels = []
+    points = []
+
+    for key, value in session["user"]["genres"]:
+        colors.append("%06x" % random.randint(0, 0xFFFFFF))
+        labels.append(key.upper())
+        points.append(value)
+
+    return render_template("genres.html")
 
 @app.route('/artists/top', defaults = {'range': 'all_time'})
 def top_artists(range):
@@ -203,7 +223,7 @@ def top_artists(range):
         return redirect(url_for('top_artists'))
     
     if range not in valid_ranges:
-        flash("Use the buttons instead! 😤", "error")
+        flash("Creativity is good, but use the buttons instead! 😤", "error")
         return redirect(url_for('top_artists'))
 
     if range == "alltime":

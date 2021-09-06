@@ -11,12 +11,12 @@
     </label>
   </div>
 
-  <div class="navbar-end">
+  <div id="nav-menu" class="navbar-end nav-menu">
     <div class="navbar-item">
       <a class="navbar-item" href="/tracks/top?range=alltime">
         TRACKS
       </a>
-      <a class="navbar-item" href="/genres/top?range=alltime">
+      <a class="navbar-item" href="/genres">
         GENRES
       </a>
       <a class="navbar-item" href="/artists/top?range=alltime">
@@ -62,5 +62,17 @@
     {% endfor %}
 
 </section>
+<script type="text/javascript">
+  document.getElementById("nav-toggle").addEventListener ("click", toggleNav);
+  function toggleNav() {
+          var nav = document.getElementById("nav-menu");
+          var className = nav.getAttribute("class");
+          if(className == "navbar-end") {
+              nav.className = "navbar-end is-active";
+          } else {
+              nav.className = "navbar-end";
+          }
+  }
+</script>
 {% endif %}
 {% endwith %}
