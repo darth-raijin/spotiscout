@@ -196,12 +196,25 @@ def pair_tracks(items: list):
 def top_genres():
     colors = []
     labels = []
-    points = []
+    genre_weight = []
 
-    for key, value in session["user"]["genres"]:
-        colors.append("%06x" % random.randint(0, 0xFFFFFF))
-        labels.append(key.upper())
-        points.append(value)
+    if session["user"]["genres"]["colors"] != len(session["user"]["genres"]):
+        for key, value in session["user"]["genres"]:
+            colors.append("%06x" % random.randint(0, 0xFFFFFF))
+
+    if session["user"]["genres"]["labels"] != len(session["user"]["genres"]):
+        for key, value in session["user"]["genres"]:
+            labels.append(key.upper())
+
+    if session["user"]["genres"]["weight"] != len(session["user"]["genres"]):
+        for key, value in session["user"]["genres"]:
+            labels.append(key.upper())
+
+        genre_weight.append(value)
+    
+    session["user"]["genres"]["colors"] = colors
+    session["user"]["genres"]["labels"] = labels
+    session["user"]["genres"]["weight"] = genre_weight
 
     return render_template("genres.html")
 
