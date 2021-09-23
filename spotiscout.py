@@ -36,7 +36,7 @@ def session_cache_path():
 def index():
     if not session.get('user'):
         session.clear()
-   
+
     if not session.get("uuid"):
         # Visitor gets assigned a random UUID if they don't have one.
         session['uuid'] = str(uuid.uuid4())
@@ -48,10 +48,10 @@ def index():
 
     # If user gets redirected from Spotify, they will have "code" in payload
     if request.args.get("code"):
-        
+        session["user"] = {}
         auth_manager.get_access_token(request.args.get("code"))
-
-        get_artist_background()
+        # TODO create get_profile data
+        set_profile()
         get_total_playlists()
         get_top_artists()
         get_top_tracks()
@@ -66,10 +66,19 @@ def index():
 
     return render_template("index.html")
 
+
+def set_profile():
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    session["user"] = spotify.me()
+
 @app.route('/profile')
 def profile():
     spotify, auth_manager = confirm_authentication()
     spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    print(spotify.me())
 
     artists = []
     tracks =  []
@@ -286,27 +295,6 @@ def recent():
 
 # Functions for getting profile data
 
-def top_artist_background(item: dict):
-    """Gets the URL for the artist image
-
-    Args:
-        item (dict): Received from Spotify API with data about user's single top artist
-
-    Returns:
-        String: URL for top artist's background image
-    """
-    return item.get("items")[0]["images"][0]["url"]
-
-def get_artist_background():
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    session["user"] = spotify.me()
-
-    # Set top artist image, to use for background in profile
-    session["user"]["top_artist_background"] = top_artist_background(spotify.current_user_top_artists(time_range="long_term", limit=1))
-
-
 def check_easteregg(query: str):
     eastereggs = ["dbe", "deeznuts"]
     if query in eastereggs:
@@ -336,6 +324,7 @@ def get_total_playlists():
 
     playlist_count = 0
     playlists = spotify.current_user_playlists(limit=50)
+    print(playlists)
 
     while playlists['next']:
         playlists = spotify.next(playlists)
