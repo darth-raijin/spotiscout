@@ -4,8 +4,10 @@ from flask_session import Session
 from dotenv import load_dotenv
 from datetime import date
 import spotipy
+import sys
 import uuid
 import random
+import colors as colors
 
 
 load_dotenv()
@@ -15,6 +17,10 @@ app.config['SECRET_KEY'] = os.urandom(64)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
+
+
+
+colors = colors.load_colors()
 
 scope = "playlist-read-private user-read-recently-played user-top-read playlist-modify-public user-library-read playlist-read-private"
 
@@ -56,6 +62,8 @@ def index():
         get_top_artists()
         get_top_tracks()
 
+
+
         return render_template("index.html")
 
 
@@ -72,13 +80,12 @@ def set_profile():
     spotify = spotipy.Spotify(auth_manager=auth_manager)
 
     session["user"] = spotify.me()
+    
 
 @app.route('/profile')
 def profile():
     spotify, auth_manager = confirm_authentication()
     spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    print(spotify.me())
 
     artists = []
     tracks =  []
@@ -93,7 +100,6 @@ def profile():
 
     for genre in session["user"]["genres"]:
         genre_count += 1
-    session["user"]["genres"] = {k: v for k, v in sorted(session["user"]["genres"].items(), key=lambda item: item[1], reverse = True)}
 
     iter_count = 0
     for genre in session["user"]["genres"]:
@@ -103,8 +109,6 @@ def profile():
         
         if iter_count >= 3:
             break
-
-    print(session["user"]["genres"])
     # TODO Sort Chart.js for Genres
 
     return render_template("profile.html", artists = artists, tracks = tracks, genre_count = genre_count, genres = genres)
@@ -203,29 +207,52 @@ def pair_tracks(items: list):
 
 @app.route('/genres')
 def top_genres():
+    # Creates Genre profiles for 10 top tracks
+    max_genres = 10
     colors = []
     labels = []
     genre_weight = []
 
-    if session["user"]["genres"]["colors"] != len(session["user"]["genres"]):
-        for key, value in session["user"]["genres"]:
-            colors.append("%06x" % random.randint(0, 0xFFFFFF))
+    if "sort_status" not in session["user"]["genres"]:
+        sorted_genres = {k: v for k, v in sorted(session["user"]["genres"].items(), reverse = True, key=lambda x: x[1])}
+        session["user"]["genres"]["sort_status"] = True
+    else: 
+        print("Already sorted!")
 
-    if session["user"]["genres"]["labels"] != len(session["user"]["genres"]):
-        for key, value in session["user"]["genres"]:
-            labels.append(key.upper())
 
-    if session["user"]["genres"]["weight"] != len(session["user"]["genres"]):
-        for key, value in session["user"]["genres"]:
-            labels.append(key.upper())
 
-        genre_weight.append(value)
-    
-    session["user"]["genres"]["colors"] = colors
-    session["user"]["genres"]["labels"] = labels
-    session["user"]["genres"]["weight"] = genre_weight
+    # If an equal amount of profile data is not loaded, loading will be done
+    try:
+        if len(session["user"]["genres"]["profiles"]) != max_genres:
+            load_genreprofiles(sorted_genres)
+    except:
+        load_genreprofiles(sorted_genres)
 
     return render_template("genres.html")
+
+def load_genreprofiles(sorted_genres: dict):
+    # Resetting genre profiles
+    session["user"]["genres"]["profiles"] = []
+    total_weight = 0
+    results = []
+
+    ten_genres = list(sorted_genres.items())[:10]
+
+    # Iterate through all values and add to total_weight
+    for item in ten_genres:
+        total_weight += item[1]
+
+    # Set index 2 to weight based on total_weight
+    for item in ten_genres:
+        current_dict = {}
+        current_dict["label"] = item[0]
+        current_dict["weight"] = item[1]
+        current_dict["relative_weight"] = round(item[1] / total_weight * 100, 2)
+        results.append(current_dict)
+
+    session["user"]["genres"]["profiles"] = results
+    # Efter de 10 
+    return 2
 
 @app.route('/artists/top', defaults = {'range': 'all_time'})
 def top_artists(range):
@@ -265,7 +292,7 @@ def top_artists(range):
 
 @app.route('/me')
 def me():
-    return session["user"]
+    return session["user"]["genres"]
 
 # DONE DIEGO
 @app.route('/recent')
@@ -324,7 +351,6 @@ def get_total_playlists():
 
     playlist_count = 0
     playlists = spotify.current_user_playlists(limit=50)
-    print(playlists)
 
     while playlists['next']:
         playlists = spotify.next(playlists)
@@ -463,6 +489,8 @@ def extract_genres(item: dict):
     except:
         print(f"Genre extraction failed!")
         return None
+
+
 
 # DONE DIEGO
 def add_to_playlist(tracks: list, playlist_id):
