@@ -8,6 +8,7 @@ import sys
 import uuid
 import random
 import colors as colors
+import json
 
 
 load_dotenv()
@@ -209,17 +210,14 @@ def pair_tracks(items: list):
 def top_genres():
     # Creates Genre profiles for 10 top tracks
     max_genres = 10
-    colors = []
+    values = []
     labels = []
-    genre_weight = []
 
     if "sort_status" not in session["user"]["genres"]:
         sorted_genres = {k: v for k, v in sorted(session["user"]["genres"].items(), reverse = True, key=lambda x: x[1])}
         session["user"]["genres"]["sort_status"] = True
     else: 
         print("Already sorted!")
-
-
 
     # If an equal amount of profile data is not loaded, loading will be done
     try:
@@ -228,7 +226,13 @@ def top_genres():
     except:
         load_genreprofiles(sorted_genres)
 
-    return render_template("genres.html")
+    for item in session["user"]["genres"]["profiles"]:
+        values.append(item.get("relative_weight"))
+        labels.append(item.get("label"))
+
+    brr = ['brr1', 'brr2', 'brr3', 'brr4', 'brr5', 'brr6']
+
+    return render_template("genres.html", values = json.dumps(values), labels = json.dumps(labels), colors = json.dumps(colors))
 
 def load_genreprofiles(sorted_genres: dict):
     # Resetting genre profiles
@@ -243,14 +247,20 @@ def load_genreprofiles(sorted_genres: dict):
         total_weight += item[1]
 
     # Set index 2 to weight based on total_weight
+    index = 0
     for item in ten_genres:
         current_dict = {}
-        current_dict["label"] = item[0]
+        current_dict["label"] = item[0].capitalize()
         current_dict["weight"] = item[1]
         current_dict["relative_weight"] = round(item[1] / total_weight * 100, 2)
+        index += 1
         results.append(current_dict)
 
+    print(results)
+
     session["user"]["genres"]["profiles"] = results
+
+
     # Efter de 10 
     return 2
 

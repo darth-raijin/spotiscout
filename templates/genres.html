@@ -1,7 +1,35 @@
 {% extends 'base.html' %}
 {% block content%}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <p class="title">
+                TOP 10 GENRES
+            </p>
 
+        </div>
+    </div>
+    </div>
+</section>
+{% for item, label, colors in set %} {% endfor %}
+<div class="container is-fluid">
+    <canvas id="myChart" width="400" height="400"></canvas>
+    <script>
+        var ctx = document.getElementById('myChart');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: {{ labels | safe }},
+        datasets: [{
+            label: 'Popularity of a genre among your listened artists!',
+            data: {{ values | safe }},
+            backgroundColor: {{ colors | safe }},
+            hoverOffset: 4
+        }]
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-
+    }
+});
+    </script>
+</div>
+{{colors}}
 {% endblock%}
