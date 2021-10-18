@@ -4,45 +4,54 @@
       <h1>SPOTISCOUT</h1>
     </a>
 
-    <label for="toggler" class="navbar-burger burger">
+    <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
-    </label>
+    </a>
   </div>
 
-  <div id="nav-menu" class="navbar-end nav-menu">
-    <div class="navbar-item">
-      <a class="navbar-item" href="/tracks/top?range=alltime">
-        TRACKS
-      </a>
-      <a class="navbar-item" href="/genres">
-        GENRES
-      </a>
-      <a class="navbar-item" href="/artists/top?range=alltime">
-        ARTISTS
-      </a>
-      <a class="navbar-item" href="/recent">
-        RECENT
-      </a>
-      
-      <div class="buttons">
-        
+  <div class="navbar-menu">
+    <div class="navbar-end">
+      <div class="navbar-item">
         {% if session["user"] %}
-        <a class="button is-link" href="/profile">
-          {{session["user"]["display_name"]}}
-        </a>
-        <a class="button is-danger" id = "signout" href="/logout">
-          <strong>SIGN OUT</strong>
-        </a>
-        {% else %}
-        <a class="button is-primary has-tooltip-bottom" href = {{auth_url}}>
-          <strong>SIGN IN</strong>
-        </a>
-        {% endif %}
-
-      </div>
+    
+          <a class=" navbar-item" href="/tracks/top?range=alltime">
+            TRACKS
+          </a>
+          <a class=" navbar-item" href="/genres">
+            GENRES
+          </a>
+          <a class=" navbar-item" href="/artists/top?range=alltime">
+            ARTISTS
+          </a>
+          <a class=" navbar-item" href="/recent">
+            RECENT
+          </a>
+          {% endif %}
+          
+          <div class="buttons">
+            
+            {% if session["user"] %}
+            <a class="button is-info" href="/profile">
+              {{session["user"]["display_name"]}}
+            </a>
+            <a class="button is-danger" id = "signout" href="/logout">
+              <strong>SIGN OUT</strong>
+            </a>
+            {% else %}
+            <a class="button is-primary has-tooltip-bottom" href = {{auth_url}} disabled>
+              <strong>Sign in to use features</strong>
+            </a>
+            <a class="button is-primary has-tooltip-bottom" href = {{auth_url}}>
+              <strong>SIGN IN</strong>
+            </a>
+            {% endif %}
+    
+          </div>
+        </div>
     </div>
+
   </div>
   </div>
 </nav>
@@ -62,17 +71,19 @@
     {% endfor %}
 
 </section>
-<script type="text/javascript">
-  document.getElementById("nav-toggle").addEventListener ("click", toggleNav);
-  function toggleNav() {
-          var nav = document.getElementById("nav-menu");
-          var className = nav.getAttribute("class");
-          if(className == "navbar-end") {
-              nav.className = "navbar-end is-active";
-          } else {
-              nav.className = "navbar-end";
-          }
-  }
+
+<script>
+  $(document).ready(function() {
+
+// Check for click events on the navbar burger icon
+$(".navbar-burger").click(function() {
+
+    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+    $(".navbar-burger").toggleClass("is-active");
+    $(".navbar-menu").toggleClass("is-active");
+
+});
+});
 </script>
 {% endif %}
 {% endwith %}

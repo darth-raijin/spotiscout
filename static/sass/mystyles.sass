@@ -3,8 +3,9 @@
 // Import a Google Font
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500&display=swap");
 // Set your brand colors
-$purple: #59009d;
-$dark-mode: #171717;
+$purple: #a159ff;
+$dark-mode: #1a1a1c;
+$dark-mode2: #212122;
 $lighter-dark: #343434;
 $blue: #3F88C5;
 $beige-light: #8bb411;
@@ -15,10 +16,12 @@ $red: #D00000;
 $family-sans-serif: "Montserrat", sans-serif;
 $grey-dark: #FBFEF9;
 $grey-light: $beige-light;
-$primary: $blue;
+$primary: $purple;
 $link: $purple;
 $widescreen-enabled: false;
 $fullhd-enabled: false;
+$text: $beige-lighter;
+$button-color: $beige-lighter;
 
 // Update some of Bulma's component variables
 $body-background-color: $dark-mode;
@@ -32,11 +35,21 @@ $navbar-item-hover-background-color: transparent;
 $navbar-item-hover-color: $link;
 $navbar-burger-color: $link;
 $text: $grey-dark;
+$button-text-color: $beige-lighter;
+
+
+// Cards
+$card-background-color: $dark-mode2;
+$button-static-color: $beige-lighter;
+$button-ghost-border-color: $purple;
 
 // Hero
 $title-color: $grey-dark;
 $title-hover-color: $link;
 $subtitle-color: $link;
+#title { color: $purple;}
+#subtitle {color: $beige-lighter;}
+#signout { background-color: $red;}
 
 // footer
 $footer-background-color: transparent;
@@ -51,7 +64,6 @@ $input-color: #fff;
 $menu-item-hover-background-color: $purple;
 $menu-item-hover-color: white;
 
-#signout { background-color: $red; }
 
 // Import only what you need from Bulma
 @import "assets/sass/utilities/_all.sass";

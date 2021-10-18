@@ -9,6 +9,7 @@ import uuid
 import random
 import colors as colors
 import json
+import css_builder
 
 
 load_dotenv()
@@ -20,7 +21,7 @@ app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
 
 
-
+builder = css_builder.load_colors()
 colors = colors.load_colors()
 
 scope = "playlist-read-private user-read-recently-played user-top-read playlist-modify-public user-library-read playlist-read-private"
@@ -134,7 +135,7 @@ def create_playlist(time_range: str):
 
     user_id = spotify.me()['id']
 
-    spotify.user_playlist_create(user = user_id, 
+    spotify.user_playßlist_create(user = user_id, 
     name = f'Spotiscout Top 50 - {time_range.capitalize()}',
     description = f'Created with the help of Spotiscout | {today.strftime("%d/%m/%Y")}')
 
@@ -157,7 +158,7 @@ def top_tracks(range):
     
     if range not in valid_ranges:
         flash("Use the buttons instead! 😤", "error")
-        return redirect(url_for('top_tracks'))
+        range = "alltime"
 
     if range == "alltime":
         long_button =  ""
@@ -259,10 +260,7 @@ def load_genreprofiles(sorted_genres: dict):
     session["user"]["genres"]["profiles"] = results
 
 
-    # Efter de 10 
-    return 2
-
-@app.route('/artists/top', defaults = {'range': 'all_time'})
+@app.route('/artists/top', defaults = {'range': 'alltime'})
 def top_artists(range):
     valid_ranges = ["alltime", "short", "medium"]
     range = request.args.get('range')
@@ -277,11 +275,11 @@ def top_artists(range):
 
 
     if range is None:
-        return redirect(url_for('top_artists'))
+        return redirect(url_for('top_artists', variable = "alltime"))
     
     if range not in valid_ranges:
         flash("Creativity is good, but use the buttons instead! 😤", "error")
-        return redirect(url_for('top_artists'))
+        range = "alltime"
 
     if range == "alltime":
         long_button =  ""

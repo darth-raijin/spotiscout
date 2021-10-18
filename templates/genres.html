@@ -12,7 +12,7 @@
     </div>
 </section>
 {% for item, label, colors in set %} {% endfor %}
-<div class="container is-fluid">
+<div class="container ">
     <canvas id="myChart" width="400" height="400"></canvas>
     <script>
         var ctx = document.getElementById('myChart');
@@ -31,5 +31,4 @@
 });
     </script>
 </div>
-{{colors}}
 {% endblock%}
