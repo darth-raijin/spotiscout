@@ -230,8 +230,6 @@ def top_genres():
         values.append(item.get("relative_weight"))
         labels.append(item.get("label"))
 
-    brr = ['brr1', 'brr2', 'brr3', 'brr4', 'brr5', 'brr6']
-
     return render_template("genres.html", values = json.dumps(values), labels = json.dumps(labels), colors = json.dumps(colors))
 
 def load_genreprofiles(sorted_genres: dict):
