@@ -4,9 +4,12 @@ from flask_session import Session
 from dotenv import load_dotenv
 from datetime import date
 import spotipy
+import sys
 import uuid
-import asyncio
-import argparse
+import random
+import colors as colors
+import json
+
 
 load_dotenv()
 
@@ -15,6 +18,10 @@ app.config['SECRET_KEY'] = os.urandom(64)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
+
+
+
+colors = colors.load_colors()
 
 scope = "playlist-read-private user-read-recently-played user-top-read playlist-modify-public user-library-read playlist-read-private"
 
@@ -36,7 +43,7 @@ def session_cache_path():
 def index():
     if not session.get('user'):
         session.clear()
-   
+
     if not session.get("uuid"):
         # Visitor gets assigned a random UUID if they don't have one.
         session['uuid'] = str(uuid.uuid4())
@@ -48,13 +55,15 @@ def index():
 
     # If user gets redirected from Spotify, they will have "code" in payload
     if request.args.get("code"):
-        
+        session["user"] = {}
         auth_manager.get_access_token(request.args.get("code"))
-
-        get_artist_background()
+        # TODO create get_profile data
+        set_profile()
         get_total_playlists()
         get_top_artists()
         get_top_tracks()
+
+
 
         return render_template("index.html")
 
@@ -66,6 +75,14 @@ def index():
 
     return render_template("index.html")
 
+
+def set_profile():
+    spotify, auth_manager = confirm_authentication()
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    session["user"] = spotify.me()
+    
+
 @app.route('/profile')
 def profile():
     spotify, auth_manager = confirm_authentication()
@@ -73,11 +90,8 @@ def profile():
 
     artists = []
     tracks =  []
-    try: 
-        if session["user"]["track_count"] is None:
-            get_total_tracks()
-    except:
-        get_total_tracks()
+    genres = []
+    genre_count = 0
 
     for artist in session["user"]["long_artists"][:3]:
         artists.append(artist)
@@ -85,9 +99,20 @@ def profile():
     for track in session["user"]["long_tracks"][:3]:
         tracks.append(track)
 
+    for genre in session["user"]["genres"]:
+        genre_count += 1
+
+    iter_count = 0
+    for genre in session["user"]["genres"]:
+        if iter_count < 3:
+            genres.append(genre.capitalize())
+            iter_count += 1
+        
+        if iter_count >= 3:
+            break
     # TODO Sort Chart.js for Genres
 
-    return render_template("profile.html", artists = artists, tracks = tracks, genres = session["user"]["genres"])
+    return render_template("profile.html", artists = artists, tracks = tracks, genre_count = genre_count, genres = genres)
 
 
 @app.route('/logout')
@@ -181,9 +206,61 @@ def pair_tracks(items: list):
     return tracks
 
 
-@app.route('/genres/top', defaults = {'range': 'all_time'})
-def top_genres(range):
-    confirm_authentication()
+@app.route('/genres')
+def top_genres():
+    # Creates Genre profiles for 10 top tracks
+    max_genres = 10
+    values = []
+    labels = []
+
+    if "sort_status" not in session["user"]["genres"]:
+        sorted_genres = {k: v for k, v in sorted(session["user"]["genres"].items(), reverse = True, key=lambda x: x[1])}
+        session["user"]["genres"]["sort_status"] = True
+    else: 
+        print("Already sorted!")
+
+    # If an equal amount of profile data is not loaded, loading will be done
+    try:
+        if len(session["user"]["genres"]["profiles"]) != max_genres:
+            load_genreprofiles(sorted_genres)
+    except:
+        load_genreprofiles(sorted_genres)
+
+    for item in session["user"]["genres"]["profiles"]:
+        values.append(item.get("relative_weight"))
+        labels.append(item.get("label"))
+
+    return render_template("genres.html", values = json.dumps(values), labels = json.dumps(labels), colors = json.dumps(colors))
+
+def load_genreprofiles(sorted_genres: dict):
+    # Resetting genre profiles
+    session["user"]["genres"]["profiles"] = []
+    total_weight = 0
+    results = []
+
+    ten_genres = list(sorted_genres.items())[:10]
+
+    # Iterate through all values and add to total_weight
+    for item in ten_genres:
+        total_weight += item[1]
+
+    # Set index 2 to weight based on total_weight
+    index = 0
+    for item in ten_genres:
+        current_dict = {}
+        current_dict["label"] = item[0].capitalize()
+        current_dict["weight"] = item[1]
+        current_dict["relative_weight"] = round(item[1] / total_weight * 100, 2)
+        index += 1
+        results.append(current_dict)
+
+    print(results)
+
+    session["user"]["genres"]["profiles"] = results
+
+
+    # Efter de 10 
+    return 2
 
 @app.route('/artists/top', defaults = {'range': 'all_time'})
 def top_artists(range):
@@ -203,7 +280,7 @@ def top_artists(range):
         return redirect(url_for('top_artists'))
     
     if range not in valid_ranges:
-        flash("Use the buttons instead! 😤", "error")
+        flash("Creativity is good, but use the buttons instead! 😤", "error")
         return redirect(url_for('top_artists'))
 
     if range == "alltime":
@@ -223,7 +300,7 @@ def top_artists(range):
 
 @app.route('/me')
 def me():
-    return session["user"]
+    return session["user"]["genres"]
 
 # DONE DIEGO
 @app.route('/recent')
@@ -252,27 +329,6 @@ def recent():
     return render_template("recent.html", recent = tracks)
 
 # Functions for getting profile data
-
-def top_artist_background(item: dict):
-    """Gets the URL for the artist image
-
-    Args:
-        item (dict): Received from Spotify API with data about user's single top artist
-
-    Returns:
-        String: URL for top artist's background image
-    """
-    return item.get("items")[0]["images"][0]["url"]
-
-def get_artist_background():
-    spotify, auth_manager = confirm_authentication()
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-
-    session["user"] = spotify.me()
-
-    # Set top artist image, to use for background in profile
-    session["user"]["top_artist_background"] = top_artist_background(spotify.current_user_top_artists(time_range="long_term", limit=1))
-
 
 def check_easteregg(query: str):
     eastereggs = ["dbe", "deeznuts"]
@@ -441,6 +497,8 @@ def extract_genres(item: dict):
     except:
         print(f"Genre extraction failed!")
         return None
+
+
 
 # DONE DIEGO
 def add_to_playlist(tracks: list, playlist_id):

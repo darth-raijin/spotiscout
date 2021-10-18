@@ -11,12 +11,12 @@
     </label>
   </div>
 
-  <div class="navbar-end">
+  <div id="nav-menu" class="navbar-end nav-menu">
     <div class="navbar-item">
       <a class="navbar-item" href="/tracks/top?range=alltime">
         TRACKS
       </a>
-      <a class="navbar-item" href="/genres/top?range=alltime">
+      <a class="navbar-item" href="/genres">
         GENRES
       </a>
       <a class="navbar-item" href="/artists/top?range=alltime">
@@ -31,9 +31,6 @@
         {% if session["user"] %}
         <a class="button is-link" href="/profile">
           {{session["user"]["display_name"]}}
-        </a>
-        <a class="button is-light" href="/settings">
-          <strong>SETTINGS</strong>
         </a>
         <a class="button is-danger" href="/logout">
           <strong>SIGN OUT</strong>
@@ -50,8 +47,9 @@
   </div>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
 <section class="section">
-  {% if messages %}
+
     {% for category, message in messages %}
     {% if category == "success"%}
     <div class="notification is-primary">
@@ -62,6 +60,19 @@
       {{message}}
     </div>
     {% endfor %}
-  {% endif %}
+
 </section>
+<script type="text/javascript">
+  document.getElementById("nav-toggle").addEventListener ("click", toggleNav);
+  function toggleNav() {
+          var nav = document.getElementById("nav-menu");
+          var className = nav.getAttribute("class");
+          if(className == "navbar-end") {
+              nav.className = "navbar-end is-active";
+          } else {
+              nav.className = "navbar-end";
+          }
+  }
+</script>
+{% endif %}
 {% endwith %}
