@@ -3,25 +3,29 @@
 // Import a Google Font
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500&display=swap");
 // Set your brand colors
-$blue: #00509d;
-$dark-mode: #171717;
+$purple: #a159ff;
+$dark-mode: #1a1a1c;
+$dark-mode2: #212122;
 $lighter-dark: #343434;
-$orange: #ff7d00;
+$blue: #3F88C5;
 $beige-light: #8bb411;
 $beige-lighter: #eff0eb;
+$red: #D00000;
 
 // Update Bulma's global variables
 $family-sans-serif: "Montserrat", sans-serif;
-$grey-dark: #fff;
+$grey-dark: #FBFEF9;
 $grey-light: $beige-light;
-$primary: $blue;
-$link: $orange;
+$primary: $purple;
+$link: $purple;
 $widescreen-enabled: false;
 $fullhd-enabled: false;
+$text: $beige-lighter;
+$button-color: $beige-lighter;
 
 // Update some of Bulma's component variables
 $body-background-color: $dark-mode;
-$control-border-width: 2px;
+
 $input-border-color: transparent;
 $input-shadow: none;
 
@@ -30,43 +34,47 @@ $navbar-background-color: transparent;
 $navbar-item-hover-background-color: transparent;
 $navbar-item-hover-color: $link;
 $navbar-burger-color: $link;
-$text: #fff;
+$text: $grey-dark;
+$button-text-color: $beige-lighter;
+
+
+// Cards
+$card-background-color: $dark-mode2;
+$button-static-color: $beige-lighter;
+$button-ghost-border-color: $purple;
 
 // Hero
-$title-color: #fff;
+$title-color: $grey-dark;
 $title-hover-color: $link;
 $subtitle-color: $link;
+#title { color: $purple;}
+#subtitle {color: $beige-lighter;}
+#signout { background-color: $red;}
+
 
 // footer
 $footer-background-color: transparent;
 $button-background-color: transparent;
 $button-hover-color: $text;
 $button-color: $text;
-$button-border-color: $blue;
+$button-border-color: $purple;
 $button-hover-border-color: transparent;
 $button-ghost-background: transparent;
 $input-background-color: $lighter-dark;
 $input-color: #fff;
-$menu-item-hover-background-color: $blue;
+$menu-item-hover-background-color: $purple;
 $menu-item-hover-color: white;
 
 
-.button:hover {
-    background-color: $blue;
-}
-.has-bg-img {
-    background-image: url("/public/logo512.png") center center;
-    background-size: cover;
-}
-
 // Import only what you need from Bulma
-@import "../../assets/bulma/sass/utilities/_all.sass";
-@import "../../assets/bulma/sass/base/_all.sass";
-@import "../../assets/bulma/sass/elements/button.sass";
-@import "../../assets/bulma/sass/elements/container.sass";
-@import "../../assets/bulma/sass/components/menu.sass";
-@import "../../assets/bulma/sass/elements/title.sass";
-@import "../../assets/bulma/sass/form/_all.sass";
-@import "../../assets/bulma/sass/components/navbar.sass";
-@import "../../assets/bulma/sass/layout/hero.sass";
-@import "../../assets/bulma/sass/layout/section.sass";
+@import "assets/sass/utilities/_all.sass";
+@import "assets/sass/base/_all.sass";
+@import "assets/sass/elements/_all.sass";
+@import "assets/sass/elements/container.sass";
+@import "assets/sass/components/menu.sass";
+@import "assets/sass/components/card.sass";
+@import "assets/sass/elements/title.sass";
+@import "assets/sass/form/_all.sass";
+@import "assets/sass/components/navbar.sass";
+@import "assets/sass/layout/_all.sass";
+@import "assets/sass/helpers/_all.sass";

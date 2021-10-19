@@ -1,4 +1,44 @@
 {% extends 'base.html' %}
 {% block content%}
+<section class="hero is-large ">
+    <div class="hero-body">
+        <p class="title">
+            Dive into your music habits
+          </p>
+          <p class="subtitle">
+            {% if session["user"] %}
 
+            <a href={{button_url}}>
+                <button class="button is-primary">{{button_text}}</button>
+            </a>
+            {% else %}
+            <a href={{auth_url}}>
+                <button class="button is-primary">Sign in to enjoy the site!</button>
+            </a>
+            
+            {% endif %}
+          </p>
+    </div>
+  </section>
+
+  <section class="section is-large">
+    <h1 class="title">🛤️ Tracks</h1>
+    <h2 class="subtitle">
+      Look at your top 50 tracks across three different time ranges!
+    </h2>
+  </section>
+
+  <section class="section is-large">
+    <h1 class="title">🗿 Artists</h1>
+    <h2 class="subtitle">
+      Take a look at the possibilities with Spotiscout
+    </h2>
+  </section>
+
+  <section class="section is-large">
+    <h1 class="title">⏱️ Recent</h1>
+    <h2 class="subtitle">
+      Take a look at the possibilities with Spotiscout
+    </h2>
+  </section>
 {% endblock%}

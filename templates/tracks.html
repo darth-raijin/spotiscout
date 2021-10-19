@@ -19,23 +19,23 @@
         <div>
             <p class="heading">Select time range and see the magic!</p>
             <div class="field has-addons">
-                <p class="control">
+                <p class="control" id = "subtitle">
                     <a href="/tracks/top?range=short">
-                        <button class="button is-info {{short_button}}">
+                        <button class="button is-primary {{short_button}}" id="subtitle">
                             <span>Last 4 weeks</span>
                         </button>
                 </p>
                 </a>
-                <p class="control">
+                <p class="control" id = "subtitle">
                     <a href="/tracks/top?range=medium">
-                        <button class="button is-info {{medium_button}}">
+                        <button class="button is-primary {{medium_button}}" id="subtitle">
                             <span>Last 6 months</span>
                         </button>
                     </a>
                 </p>
-                <p class="control">
+                <p class="control" id = "subtitle">
                     <a href="/tracks/top?range=alltime">
-                        <button class="button is-info {{long_button}}">
+                        <button class="button is-primary {{long_button}}" id="subtitle">
                             <span>All time</span>
                         </button>
                     </a>
@@ -51,7 +51,7 @@
           <div class="field has-addons">
               <p class="control">
                   <a href="/tracks/top?range=alltime&save={{current}}">
-                      <button class="button is-info">
+                      <button class="button is-primary">
                           <span>Create Playlist</span>
                       </button>
                   </a>
@@ -88,8 +88,8 @@
           <!-- Bottom button for artist-->
           <div class="content">
             <a href={{track.get("artist_url")}}>
-              <button class="button is-outlined is-info">
-                <p class="subtitle is-6">{{track.get("artist")}}</p>
+              <button class="button is-outlined is-primary">
+                <p class="subtitle is-6" id ="subtitle">{{track.get("artist")}}</p>
               </button>
             </a>
           </div>

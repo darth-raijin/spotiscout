@@ -9,6 +9,7 @@ import uuid
 import random
 import colors as colors
 import json
+import css_builder
 
 
 load_dotenv()
@@ -20,7 +21,7 @@ app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
 
 
-
+builder = css_builder.load_colors()
 colors = colors.load_colors()
 
 scope = "playlist-read-private user-read-recently-played user-top-read playlist-modify-public user-library-read playlist-read-private"
@@ -70,10 +71,18 @@ def index():
 
     # If no token exists, user will be shown default index.html
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
+
+
         auth_url = auth_manager.get_authorize_url()
         return render_template("index.html", auth_url = auth_url)
+    
+    button_text = ["View your favorite tracks!", "View your most recently played tracks!", "View your favorite artists!", "View your favorite genres!"]
+    button_url = ["/tracks/top?range=alltime", "/recent", "/artists/top?range=alltime", "/genres"]
 
-    return render_template("index.html")
+    dice = random.randint(0,3)
+    dice_text = button_text[dice]
+    dice_url = button_url[dice]
+    return render_template("index.html", button_text = dice_text, button_url = dice_url)
 
 
 def set_profile():
@@ -157,7 +166,7 @@ def top_tracks(range):
     
     if range not in valid_ranges:
         flash("Use the buttons instead! 😤", "error")
-        return redirect(url_for('top_tracks'))
+        range = "alltime"
 
     if range == "alltime":
         long_button =  ""
@@ -259,10 +268,7 @@ def load_genreprofiles(sorted_genres: dict):
     session["user"]["genres"]["profiles"] = results
 
 
-    # Efter de 10 
-    return 2
-
-@app.route('/artists/top', defaults = {'range': 'all_time'})
+@app.route('/artists/top', defaults = {'range': 'alltime'})
 def top_artists(range):
     valid_ranges = ["alltime", "short", "medium"]
     range = request.args.get('range')
@@ -277,11 +283,11 @@ def top_artists(range):
 
 
     if range is None:
-        return redirect(url_for('top_artists'))
+        return redirect(url_for('top_artists', variable = "alltime"))
     
     if range not in valid_ranges:
         flash("Creativity is good, but use the buttons instead! 😤", "error")
-        return redirect(url_for('top_artists'))
+        range = "alltime"
 
     if range == "alltime":
         long_button =  ""
