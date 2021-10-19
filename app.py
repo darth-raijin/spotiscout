@@ -71,10 +71,18 @@ def index():
 
     # If no token exists, user will be shown default index.html
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
+
+
         auth_url = auth_manager.get_authorize_url()
         return render_template("index.html", auth_url = auth_url)
+    
+    button_text = ["View your favorite tracks!", "View your most recently played tracks!", "View your favorite artists!", "View your favorite genres!"]
+    button_url = ["/tracks/top?range=alltime", "/recent", "/artists/top?range=alltime", "/genres"]
 
-    return render_template("index.html")
+    dice = random.randint(0,3)
+    dice_text = button_text[dice]
+    dice_url = button_url[dice]
+    return render_template("index.html", button_text = dice_text, button_url = dice_url)
 
 
 def set_profile():
@@ -135,7 +143,7 @@ def create_playlist(time_range: str):
 
     user_id = spotify.me()['id']
 
-    spotify.user_playßlist_create(user = user_id, 
+    spotify.user_playlist_create(user = user_id, 
     name = f'Spotiscout Top 50 - {time_range.capitalize()}',
     description = f'Created with the help of Spotiscout | {today.strftime("%d/%m/%Y")}')
 
