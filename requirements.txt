@@ -3,3 +3,4 @@ requests
 response
 spotipy
 libsass
+gunicorn
