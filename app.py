@@ -66,22 +66,23 @@ def index():
 
 
 
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
 
     # If no token exists, user will be shown default index.html
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
-
-
         auth_url = auth_manager.get_authorize_url()
         return render_template("index.html", auth_url = auth_url)
     
-    button_text = ["View your favorite tracks!", "View your most recently played tracks!", "View your favorite artists!", "View your favorite genres!"]
+    button_text = ["View your all-time favorite tracks!", "View your most recently played tracks!", "View your all-time favorite artists!", "View your favorite genres!"]
     button_url = ["/tracks/top?range=alltime", "/recent", "/artists/top?range=alltime", "/genres"]
 
     dice = random.randint(0,3)
     dice_text = button_text[dice]
     dice_url = button_url[dice]
+
+    print(dice_text)
+    print(dice_url)
     return render_template("index.html", button_text = dice_text, button_url = dice_url)
 
 
