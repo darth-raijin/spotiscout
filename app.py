@@ -533,4 +533,4 @@ def confirm_authentication():
     return spotipy.Spotify(auth_manager=auth_manager), auth_manager
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(threaded=True, port = 5000)
